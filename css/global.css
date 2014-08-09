@@ -1,0 +1,61 @@
+
+
+a.login {
+    display: block;
+    float: right;
+    line-height:25px;
+    vertical-align:middle;
+}
+
+a.login  img {
+    vertical-align:middle;
+}
+
+a.login span {
+	padding-right:5px;
+}
+
+form#filtre {
+	width:100%;
+	background-color: #E0ECF8;
+	float:left;
+	padding: 10px 0 10px 5px;
+	margin-bottom: 20px;
+}
+
+form#filtre fieldset {
+	float: left;
+	width:33.33%;
+	margin: 0;
+	padding:0;
+	height: 160px;
+	position: relative;
+}
+
+form#filtre fieldset button{
+	position: absolute;
+	left:0;
+	bottom: 0;
+	
+}
+
+
+form#connexion {
+	margin-left: auto;
+        margin-right: auto;
+        width: 250px;
+}
+
+
+.justifie{
+	text-align: justify;
+}
+td.case {
+	text-align: center;
+}
+
+span.auteur{
+	font-style: italic;
+	
+}
+
