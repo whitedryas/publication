@@ -2,7 +2,8 @@
 <div>En attente d'approbation par: <?php
     echo $_SESSION['utilisateur']->getNomUtilisateur().'<br/>';
     ?>
-    <form>
+    <form method="POST" action="#">
+        <input type="hidden" name="nbPublications" value="<?php echo count($publications);?>">
         <table id="attente-validation" class="display pretty">
             <thead>
                 <tr>
@@ -20,15 +21,15 @@
                     <td><?php echo $publication['type'] ?></td>
                     <td><?php echo date('d/m/Y', strtotime($publication['soumis_le'])) ; ?></td>
                     <td><?php echo $publication['soumis_par'] ?></td>
-                    <td class="case"><input type="checkbox" name="publications" value="publication[id]" /></td>
+                    <td class="case"><input type="checkbox" name="idPublication" value="<?php echo $publication['IDpublication'];?>" /></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
         <label>Pour les publications sélectionnées :</label>
-        <select name="actions">
-            <option value="approuver" label="Approuver">Approuver</option>
-            <option value="rejeter" label="Rejeter">Rejeter</option>
+        <select name="statut">
+            <option value="Validé" label="Approuver">Approuver</option>
+            <option value="Rejeté" label="Rejeter">Rejeter</option>
         </select> 
         <button type="submit"> Ok </button> 
     </form>  

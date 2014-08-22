@@ -10,12 +10,29 @@ class PublicationController {
         $this->modele = new TblPublications($connexion);
     }
 
-    public function listerPourApprobateur($idApprobateur) {
+    public function listerPourApprobateur($idGroupeApprobateur) {
+        
+       /* TO DO Controler si le formulaire a été validé */ 
+        if(isset($_POST['nbPublications']) && isApprobateur()){
+            $nbPublications= filter_input(INPUT_POST, 'nbPublications');
+            $statut = filter_input(INPUT_POST, 'statut');
+           // die($statut);
+            $idApprobateur =$_SESSION['utilisateur']->getIdUtilisateur();
+            //die($idApprobateur);
+            for($i=0; $i< $nbPublications; $i++){
+                //on vérifie pour chaque publication que la case est cochée
+                if($_POST['idPublication']){
+                    $idPublication = filter_input(INPUT_POST, 'idPublication');
+                    //changer le 
+                    $this->modele->changerStatutDeLaPublication($idPublication, $statut, $idApprobateur);
+                }               
+            }
+        }
         
         $publications = $this->modele
-                ->listerPublicationsEnAttenteValidation($idApprobateur);
+                ->listerPublicationsEnAttenteValidation($idGroupeApprobateur);
         
-        /* TO DO Controler si le formulaire a été validé */
+
         return render_template('approbateur', 'liste', array('publications' => $publications));
     }
 
