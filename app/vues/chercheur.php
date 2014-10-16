@@ -10,7 +10,13 @@ if (isset($_GET['action'])){
 //			include VUES.'chercheur/liste.php';
 			break;
 		case "editer":
-			include ACTIONS.'editer.php';
+                        if(isset($_GET['id'])){
+                            $idPublication = filter_input(INPUT_GET,'id');
+                            $controleurs['publication']->editerUnePublication($idPublication);
+                        }else{
+                            $controleurs['publication']->listerPourChercheur($_SESSION['utilisateur']->getIdUtilisateur());  
+                        }
+			//include ACTIONS.'editer.php';
 			break;
 		default:
 			include VUES.'404.php';

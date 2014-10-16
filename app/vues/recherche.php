@@ -10,45 +10,50 @@
                     <div id="block-system-main" class="block block-system">
                             <div class="content">
                                     <div id="node-5" class="node node-page" about="#" typeof="foaf:Document">
-                                            <form id="filtre"> 
+                                            <form id="filtre" action="index.php?vue=publique&action=result" method="post"> 
                                             <h3>Filtre</h3>
                                                     <fieldset>
                                                             <label>Equipe</label>
-                                                            <select name="equipe"> 
-                                                                    <option value="COS">COS</option>
-                                                                    <option value="COVE">COVE</option>
-                                                                    <option value="GOC">GOC</option>
-                                                                    <option value="PR">PR</option>
-                                                                    <option value="SDMA">SDMA</option>
+                                                            <select id="equipe" name="equipe">
+                                                                <option value="">Choisissez</option>
+                                                                <option value="COS">COS</option>
+                                                                <option value="COVE">COVE</option>
+                                                                <option value="GOC">GOC</option>
+                                                                <option value="PR">PR</option>
+                                                                <option value="SDMA">SDMA</option>
                                                             </select>
                                                             <label>Langue</label>
-                                                            <select name="langue">
-                                                                    <option value="fr">FR</option>
-                                                                    <option value="en">EN</option>
+                                                            <select id="langue" name="langue">
+                                                                <option value="">Choisissez</option>
+                                                                <option value="FR">FR</option>
+                                                                <option value="EN">EN</option>
                                                             </select>
                                                             <label>Type</label>
-                                                            <select name="type">
-                                                                    <option value"article">Article de journal</option>
-                                                                    <option value"livre">Livre</option>
-                                                                    <option value"chapitre">Chapitre de livre</option>
-                                                                    <option value"internationale">Conférence internationale</option>
-                                                                    <option value"nationale">Conférence nationale</option>
+                                                            <select id="type" name="type">
+                                                                <option value="">Choisissez</option>
+                                                                <option value="Article de journal">Article de journal</option>
+                                                                <option value="Livre">Livre</option>
+                                                                <option value="Chapitre de livre">Chapitre de livre</option>
+                                                                <option value="Conférence internationale">Conférence internationale</option>
+                                                                <option value="Conférence nationale">Conférence nationale</option>
                                                             </select>
-                                                            <label>Publique</label><input type="checkbox" name="publique" />
+                                                            <label>Publique</label><input id="publique" type="checkbox" name="publique" />
                                                     </fieldset>
                                                     <fieldset>
-                                                            <label>Titre</label><input type="text">
-                                                            <label>Auteur</label><input type="text">
-                                                            <label>Editeur</label><input type="text">
-                                                            <label>Titre revue ou conférence</label><input type="text">	
+                                                            <label>Titre</label><input id="titre" name="titre" type="text">
+                                                            <div class="ui-widget"><label for="auteurs">Auteur</label><input id="auteurs" name="auteur" type="text"></div>
+                                                            <div class="ui-widget"><label for="editeurs">Editeur</label><input id="editeurs" name="editeur" type="text"></div>
+                                                            <div class="ui-widget"><label for="titreLivre">Titre revue ou conférence</label><input id="titreLivre" name="titreLivre" type="text"></div>	
                                                     </fieldset>
                                                     <fieldset>
-                                                            <label>Mots-clé</label><input type="text">	
-                                                            <label>Entre le:</label><input type="text" id="date-deb" >
-                                                            <label>Et le :</label><input type="text" id="date-fin">
-                                                            <button type="submit">Lancer la recherche</button>
+                                                            <label>Mots-clé</label><input id="keyword" name="keyword" type="text">	
+                                                            <label>Entre le:</label><input id="date-deb" onChange="verifDate($('#date-deb').val(),$('#date-fin').val())" name="dateDebut" type="text">
+                                                            <label>Et le :</label><input id="date-fin" onChange="verifDate($('#date-deb').val(),$('#date-fin').val())" name="dateFin" type="text">
+                                                            <button id="valider" type="submit">Lancer la recherche</button>
+                                                            <button id="reset" type="button" onClick="resetForm()">Reset</button>
                                                     </fieldset>		
-                                            </form> 
+                                            </form>
+                                            <p id="warning" style="color:#FF0000; display: none;">Vérifiez les dates !</p>
                                             <div class="clearboth"><!----></div>
                                             <h3>Résultats de la recherche</h3>
                                             <div class="content clearfix">

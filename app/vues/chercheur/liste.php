@@ -25,7 +25,13 @@
                         ?>
                     </td>
                     <td><?php echo $publication['statut'] ?></td>
-                    <td class="case"><input type="checkbox" name="publications" value="publication[id]" /></td>
+                    <td class="case">
+                        <?php if($publication['statut']== "Validé"):?>
+                            <img src="images/tick-icon.png" />
+                        <?php else: ?>
+                            <a href="index.php?vue=chercheur&action=editer&id=<?php echo $publication['IDpublication'] ?>"> <img src="images/edit-icon.png" /></a>    
+                        <?php endif ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

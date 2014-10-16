@@ -1,5 +1,5 @@
 <?php
-require CONTROLEURS.'PublicationController.php';
+include CONTROLEURS.'PublicationController.php';
 //die(CONTROLEURS);
 //$user ='severine';
 //$pass= 'S3v3rin3';
@@ -47,7 +47,9 @@ function render_template($vue, $action, $variables){
  */
 function redirectionVersPage($vue, $action){
     //$serveur_dir = $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . '/';
-    $serveur_dir = $_SERVER['HTTP_HOST'].'/index.php';
+    $chemin=''; //local 
+    //$chemin='/MIAGE/Projet Studio/dev'; //prod
+    $serveur_dir = $_SERVER['HTTP_HOST'].$chemin.'/index.php';    
     $vue= 'vue='.$vue;
     $action= '&action='.$action;
     header('Location: http://' . $serveur_dir . '?' .$vue. $action);

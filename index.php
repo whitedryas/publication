@@ -2,12 +2,12 @@
 /** Evaluer la racine du site*/
 //define("RACINE", __DIR__.'/');
 //require_once 'app/includes/autoload.php';
+
 require_once 'autoload.php';
 include 'app/includes/config.php';
 /**
  * inclure la session et l'utilisateur AVANT tout code html */
 include INCLUDES.'session.php';
-
 
 //include 'app/includes/header.php';
 

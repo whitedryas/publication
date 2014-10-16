@@ -3,8 +3,7 @@
  * Définition des constantes d'acces au fichiers dans l'arborescence
  * 
  **/
-//define("RACINE", __DIR__.'/');
-define("RACINE",dirname(__FILE__).'/');
+define("RACINE", __DIR__.'/');
 define("VUES", RACINE.'app/vues/');
 define("UPLOAD", RACINE.'fichiers/');
 
