@@ -34,9 +34,11 @@ form#filtre fieldset {
 
 form#ajout fieldset button,
 form#filtre fieldset button{
-	position: absolute;
+	/*MAJ DU 03/10/14*/
+	/*position: absolute;
 	left:0;
-	bottom: 0;
+	bottom: 0;*/
+        margin-top:20px;
 	
 }
 form#ajout fieldset.clear {

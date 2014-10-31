@@ -1,4 +1,3 @@
-<?php echo 'there';?>
 <?php include HEADER; ?>		
 <h1 class="title">Recherche et consultation des publications</h1> 
 <?php if (isIdentifie()): ?>
@@ -39,11 +38,11 @@ endif ?> value="EN">EN</option>
                         <label>Type</label>
                         <select id="type" name="type">
                             <option value="">Choisissez</option>
-                            <option <?php if ($_POST['type'] == "article") : echo "selected='selected'";
+                            <option <?php if ($_POST['type'] == "Article de journal") : echo "selected='selected'";
 endif ?> value="Article de journal">Article de journal</option>
-                            <option <?php if ($_POST['type'] == "livre") : echo "selected='selected'";
+                            <option <?php if ($_POST['type'] == "Livre") : echo "selected='selected'";
 endif ?> value="Livre">Livre</option>
-                            <option <?php if ($_POST['type'] == "chapitre") : echo "selected='selected'";
+                            <option <?php if ($_POST['type'] == "Chapitre de livre") : echo "selected='selected'";
 endif ?> value="Chapitre de livre">Chapitre de livre</option>
                             <option <?php if ($_POST['type'] == "Conférence internationale") : echo "selected='selected'";
 endif ?> value="Conférence internationale">Conférence internationale</option>
@@ -74,10 +73,34 @@ endif ?>>
                         <button id="reset" type="button" onClick="resetForm()">Reset</button>
                     </fieldset>	
                 </form>
-                <p id="warning" style="color:#FF0000; display: none;">Vérifiez les dates !</p>
+				<!--MAJ DU 03/10/14-->
+				<?php
+				if ($_POST['publique'] == "") {
+					$publique = 0;
+				} else {
+					$publique = 1;
+				};
+				$criteres = array(
+								array('name' => "nomGroupe", 'value' => $_POST['equipe']),
+								array('name' => "langue", 'value' => $_POST['langue']),
+								array('name' => "typeArticle", 'value' => $_POST['type']),
+								array('name' => "estPublique", 'value' => $publique),
+								array('name' => "titre", 'value' => explode(" ",$_POST['titre'])),
+								array('name' => "CONCAT_WS(' ', tblAuteurs.nomAuteur, tblAuteurs.prenomAuteur)", 'value' => $_POST['auteur']),
+								array('name' => "editeur", 'value' => $_POST['editeur']),
+								array('name' => "titreLivre", 'value' => $_POST['titreLivre']),
+								array('name' => "motsCles", 'value' => explode(" ",$_POST['keyword'])),
+								array('name' => "dateDebut", 'value' => $_POST['dateDebut']),
+								array('name' => "dateFin", 'value' => $_POST['dateFin']),
+							);
+				$modele = new TblPublications($dbh);
+				$results = $modele->resultatRecherche($criteres);
+				echo "<p id='warning' style='color:#FF0000; display: none;'>Vérifiez les dates !</p>";
+				echo "<p>" . count($results) . " résultat(s) corresponde(nt) à votre recherche.</p>";
+				?>
                 <div class="clearboth"><!----></div>
                 <h3>Résultats de la recherche</h3>
-                <div class="content clearfix">
+                <div class="content clearfix" style="width:100%;">
                     <div class="field field-name-body field-type-text-with-summary field-label-hidden">
                         <div class="field-items">
                             <div class="field-item even" property="content:encoded">
@@ -92,30 +115,7 @@ endif ?>>
                                         </tr></thead>
                                     <tbody>
                                         <?php
-                                        if ($_POST['publique'] == "") {
-                                            $publique = 0;
-                                        } else {
-                                            $publique = 1;
-                                        };
-                                        $criteres = array(
-                                            array('name' => "nomGroupe", 'value' => $_POST['equipe']),
-                                            array('name' => "langue", 'value' => $_POST['langue']),
-                                            array('name' => "typeArticle", 'value' => $_POST['type']),
-                                            array('name' => "estPublique", 'value' => $publique),
-                                            array('name' => "titre", 'value' => $_POST['titre']),
-                                            array('name' => "CONCAT_WS(' ', tblAuteurs.nomAuteur, tblAuteurs.prenomAuteur)", 'value' => $_POST['auteur']),
-                                            array('name' => "editeur", 'value' => $_POST['editeur']),
-                                            array('name' => "titreLivre", 'value' => $_POST['titreLivre']),
-                                            array('name' => "motsCles", 'value' => $_POST['keyword']),
-                                            array('name' => "dateDebut", 'value' => $_POST['dateDebut']),
-                                            array('name' => "dateFin", 'value' => $_POST['dateFin']),
-                                        );
-                                        $modele = new TblPublications($dbh);
-                                        $results = $modele->resultatRecherche($criteres);
-                                        $tmp = 0;
                                         foreach ($results as $result):
-                                            //if ($result['IDpublication']!=$tmp){
-                                            $tmp = $result['IDpublication'];
                                             ?>
                                             <tr>
                                                 <td><a href="#" title="<?php echo $result['titre']; ?>"><?php if (strlen($result['titre']) > 30) : echo substr($result['titre'], 0, 27) . "...";
@@ -135,6 +135,7 @@ endif ?>>
     <?php //} 
 endforeach;
 ?>
+									<!--FIN MAJ DU 03/10/14-->
                                     </tbody>
                                 </table>
                             </div>

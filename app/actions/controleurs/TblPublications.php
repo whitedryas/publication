@@ -8,28 +8,27 @@ class TblPublications {
     private $connexion;
     private $table = 'tblPublication';
 
-    //private $alias = '';
-
+//private $alias = '';
     public function __construct($db) {
         $this->connexion = $db;
     }
 
     /**
-     * 
+     *
      * @param type $IDGroupeApprobateur / l'ID du groupe supervisé par l'approbateur connecté
      */
     public function listerPublicationsEnAttenteValidation($IDGroupeApprobateur) {
         $stmt = $this->connexion->prepare(
-                "SELECT pub.IDpublication, 
-                           pub.titre, pub.typeArticle type, 
-                           pub.dateSoumission soumis_le,
-                           users.nomUtilisateur soumis_par
-            FROM tblPublications pub
-            INNER JOIN tblUtilisateurs users
-            ON pub.soumisPar = users.IDutilisateur
-            WHERE users.IDgroupe = :IDgroupeDeLapprobateurConnecte
-            AND pub.statut = 'En attente'
-            ORDER BY pub.dateSoumission");
+                "SELECT pub.IDpublication,
+                    pub.titre, pub.typeArticle type,
+                    pub.dateSoumission soumis_le,
+                    users.nomUtilisateur soumis_par
+                    FROM tblPublications pub
+                    INNER JOIN tblUtilisateurs users
+                    ON pub.soumisPar = users.IDutilisateur
+                    WHERE users.IDgroupe = :IDgroupeDeLapprobateurConnecte
+                    AND pub.statut = 'En attente'
+                    ORDER BY pub.dateSoumission");
         $stmt->bindParam(':IDgroupeDeLapprobateurConnecte', $IDGroupeApprobateur);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -38,7 +37,7 @@ class TblPublications {
     public function listerPublicationsParChercheur($IDChercheur) {
         $stmt = $this->connexion->prepare(
                 " SELECT DISTINCT *
-                    FROM tblPublications pub                 
+                    FROM tblPublications pub
                     WHERE soumisPar = :IDchercheurConnecte
                     ORDER BY dateSoumission DESC;"
         );
@@ -70,8 +69,8 @@ class TblPublications {
         $stmt->bindParam(':choixApprobateur', $choixApprobateur, PDO::PARAM_STR);
         $stmt->bindParam(':IDapprobateurConnecte', $IDapprobateur);
         $stmt->execute();
-//       if(!$stmt->execute()){die('Erreur' .$stmt->debugDumpParams());}
-//       $stmt->debugDumpParams();
+// if(!$stmt->execute()){die('Erreur' .$stmt->debugDumpParams());}
+// $stmt->debugDumpParams();
     }
 
     public function ajouterPublication($donnees, $IDchercheur) {
@@ -93,14 +92,14 @@ class TblPublications {
             }
             $stmt->execute();
 //
-//            $stmt = $this->connexion->prepare(
-//                    "SELECT IDpublication FROM tblPublications "
-//                    . "WHERE titre = ?"
-//                    . "AND version = ?;"
-//            );
-//            $stmt->bindParam(1, $donnees['titre'], PDO::PARAM_STR);
-//            $stmt->bindParam(2, $donnees['version']);
-//            $stmt->execute();
+// $stmt = $this->connexion->prepare(
+// "SELECT IDpublication FROM tblPublications "
+// . "WHERE titre = ?"
+// . "AND version = ?;"
+// );
+// $stmt->bindParam(1, $donnees['titre'], PDO::PARAM_STR);
+// $stmt->bindParam(2, $donnees['version']);
+// $stmt->execute();
         }
     }
 
@@ -110,10 +109,7 @@ class TblPublications {
             $requete .= $key . " = :" . $key . ",";
         }
         $requete .= " dateSoumission = CURRENT_TIMESTAMP WHERE IDpublication = :IDpublicationCourante ;";
-
         $stmt = $this->connexion->prepare($requete);
-
-
         foreach ($donnees as $key => $value) {
             $stmt->bindValue(':' . $key, $value);
         }
@@ -124,11 +120,11 @@ class TblPublications {
     public function retrouverAuteursParPublication($IDPublication) {
         $stmt = $this->connexion->prepare(
                 "SELECT CONCAT_WS(' ', aut.nomAuteur, aut.prenomAuteur ) as auteur
-                    FROM tblAuteurs aut
-                    INNER JOIN tblAuteursPublications ap
-                    ON aut.IDauteur = ap.IDauteur
-                    WHERE ap.IDpublication = :IDpublication
-                    ORDER BY ap.rang;"
+                FROM tblAuteurs aut
+                INNER JOIN tblAuteursPublications ap
+                ON aut.IDauteur = ap.IDauteur
+                WHERE ap.IDpublication = :IDpublication
+                ORDER BY ap.rang;"
         );
         $stmt->bindParam(':IDpublication', $IDPublication);
         $stmt->execute();
@@ -152,23 +148,23 @@ class TblPublications {
     //FIN MAJ DU 03/10/2014
 
     /**
-     * 
-     * @param tableau $criteres tableau pour les critères de recherches 
+     *
+     * @param tableau $criteres tableau pour les critères de recherches
      */
     public function resultatRecherche($criteres) {
         /* TODO voir pour plusieurs mots dans titre ou motsCles */
         /* TODO créer un jeu de tests plus conséquent */
         $rqt = "SELECT DISTINCT tblPublications.*,tblGroupes.nomGroupe
-                 FROM tblAuteurs
-                 JOIN tblAuteursPublications
-                 ON tblAuteurs.IDauteur = tblAuteursPublications.IDauteur
-                 JOIN tblPublications
-                 ON tblPublications.IDpublication = tblAuteursPublications.IDpublication
-                 JOIN tblUtilisateurs
-                 ON  tblPublications.soumisPar = tblUtilisateurs.IDutilisateur
-                 JOIN tblGroupes
-                 ON tblUtilisateurs.IDgroupe = tblGroupes.IDgroupe
-                 WHERE tblPublications.statut='Validé' AND ";
+            FROM tblAuteurs
+            JOIN tblAuteursPublications
+            ON tblAuteurs.IDauteur = tblAuteursPublications.IDauteur
+            JOIN tblPublications
+            ON tblPublications.IDpublication = tblAuteursPublications.IDpublication
+            JOIN tblUtilisateurs
+            ON tblPublications.soumisPar = tblUtilisateurs.IDutilisateur
+            JOIN tblGroupes
+            ON tblUtilisateurs.IDgroupe = tblGroupes.IDgroupe
+            WHERE tblPublications.statut='Validé' AND ";
         for ($i = 0; $i < count($criteres) - 2; $i++) {
             switch ($criteres[$i]['name']) {
                 case "estPublique":
@@ -178,13 +174,10 @@ class TblPublications {
                     $rqt = $rqt . $criteres[$i]['name'] . " LIKE '%" . $criteres[$i]['value'] . "%' AND ";
             }
         }
-
         if ($criteres[9]['value'] != '' && $criteres[10]['value'] != '') {
             $rqt = $rqt . "dateRedaction BETWEEN STR_TO_DATE('" . $criteres[9]['value'] . "', '%d/%m/%Y') AND STR_TO_DATE('" . $criteres[10]['value'] . "', '%d/%m/%Y') AND ";
         }
-
         $rqt = substr($rqt, 0, strlen($rqt) - 5);
-
         $stmt = $this->connexion->prepare($rqt);
         $stmt->execute();
         $publications = $stmt->fetchAll();
@@ -227,7 +220,7 @@ class TblPublications {
         $identiteAuteur = explode(" ", $auteur);
         $nomAuteur = $identiteAuteur [0];
         $prenomAuteur = $identiteAuteur [1];
-        //on ne l'ajoute que s'il n'existe pas
+//on ne l'ajoute que s'il n'existe pas
         $trouve = $this->verifierAuteur($nomAuteur, $prenomAuteur);
         if (empty($trouve)) {
             $stmt = $this->connexion->prepare(
@@ -261,14 +254,13 @@ class TblPublications {
                 "DELETE FROM tblAuteursPublications WHERE IDpublication = :IDpublication;"
         );
         $stmt->bindParam(':IDpublication', $IDpublication);
-
         $stmt->execute();
     }
 
     /**
      * Pour mettre à jour une liste d'auteurs
      * on commence par delier tous les auteurs à la publication existante
-     * puis vérifie que les auteurs sont déjà en base 
+     * puis vérifie que les auteurs sont déjà en base
      * sinon on les ajoute
      * puis on lie la nouvelle liste d'auteur à la publication
      */
