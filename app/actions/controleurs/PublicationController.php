@@ -153,14 +153,13 @@ class PublicationController {
             $this->modele->editerPublication($idPublication, $donnees);
         }elseif ($action == 'ajouter')  {
             $donnees["soumisPar"] = $idConnecte;//            
-//            var_dump($donnees);
-//            die;
-            $this->modele->ajouterPublication($donnees);
-            //$idPublication = $publication['IDpublication'];
+            $publication = $this->modele->ajouterPublication($donnees);
+            var_dump($publication); 
+            $idPublication = $publication['IDpublication'];
         } 
         /*         * mise à jour des auteurs * */
         $this->mettreAJourAuteurs($idPublication, $listeAuteurs);
-        $details = $this->detaillerUnePublication($idPublication);
+        $details = $this->detaillerUnePublication($idPublication);        
         redirectionVersPage('chercheur', 'liste');
         //return $details;
     }
@@ -171,7 +170,7 @@ class PublicationController {
                 ->detaillerUnePublication($idPublication);
 
         if (!$publication) {
-            return render_template('publique', 'inexistante');
+            return render_template('publique', 'inexistante', array());
         } else {
             $auteurs = $this->modele->retrouverAuteursParPublication($idPublication);
             return array('publication' => $publication, 'auteurs' => $this->listerLesAuteurs($auteurs));

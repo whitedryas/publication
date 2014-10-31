@@ -68,5 +68,6 @@
         <textarea name="resume" ><?php echo $publication['resume']; ?>
         </textarea>			
     </fieldset>
-    <button type="submit">Enregistrer</button>		
+    <button type="submit">Enregistrer</button>
+    <a href="index.php?vue=chercheur&action=liste"><button type="button">Annuler</button></a>
 </form> 
