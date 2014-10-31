@@ -1,12 +1,12 @@
 
-<form enctype="multipart/form-data" id="ajout" action="index.php?vue=chercheur&action=editer&id=<?php echo $publication["IDpublication"]?>" method="POST"> 
+<form enctype="multipart/form-data" id="ajout" action="#" method="POST"> 
     <fieldset>
         <label>Titre publication</label><input type="text" name ="titre" value="<?php echo $publication["titre"] ?>">
-        <label>Auteurs</label><input name="auteurs" value="<?php echo $auteurs?>" type="text" title="auteurs">
+        <label>Auteurs</label><input name="auteurs" value="<?php echo $auteurs ?>" type="text" title="auteurs">
         <label>Type</label><select name="typeArticle">
-             <?php
-               foreach ($options as $key => $value) {
-                $option = "<option value=".$key;
+            <?php
+            foreach ($options as $key => $value) {
+                $option = "<option value=" . $key;
                 if ($value == $publication['typeArticle']) {
                     $option.=" selected='selected'";
                 }
@@ -25,13 +25,14 @@
                 foreach ($langues as $key => $value) {
                     $option = "<option value=$key";
                     if ($value == $publication['langue']) {
-                        $option.=" selected='selected'";                    }
+                        $option.=" selected='selected'";
+                    }
                     $option.=">" . $value . "</option>";
                     echo $option;
                 }
                 ?>
-<!--                <option value="fr">FR</option>
-                <option value="en">EN</option>-->
+                <!--                <option value="fr">FR</option>
+                                <option value="en">EN</option>-->
             </select>
         </div>
         <div style="float:left; width:60%;">
@@ -44,9 +45,20 @@
 
     <fieldset>
         <label>Mots-clé</label><input type="text" name="motsCles" value="<?php echo $publication["motsCles"] ?>" title="mots-cle">	
-        <label>Paru le</label><input type="text" name="dateRedaction" id="date-parution" value="<?php echo date('d/m/Y', strtotime($publication['dateRedaction'])); ?>">
-        <label>Version</label><input  type="text" name="version" value="<?php echo $publication["version"] ?>">	
-        <label>Publique?</label><input type="checkbox" name="estPublique" <?php if($publication['estPublique']){echo 'checked';}?>>	
+        <label>Paru le</label><input type="text" name="dateRedaction" id="date-parution" 
+                                     value="<?php
+                                     if ($publication['dateRedaction']) {
+                                         echo date('d/m/Y', strtotime($publication['dateRedaction']));
+                                     } else {
+                                         echo date('d/m/Y');
+                                     }
+                                     ?>">
+        <label>Version</label><input  type="text" name="version" value="<?php if ($publication["version"]) {
+                                         echo $publication["version"];
+                                     } ?>">	
+        <label>Publique?</label><input type="checkbox" name="estPublique" <?php if ($publication['estPublique']) {
+                                         echo 'checked';
+                                     } ?>>	
     </fieldset>		
     <fieldset class="clear">
         <label>Lien publication</label>

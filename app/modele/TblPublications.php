@@ -74,13 +74,43 @@ class TblPublications {
 //       $stmt->debugDumpParams();
     }
 
+    public function ajouterPublication($donnees, $IDchercheur) {
+        echo 'there <br/>';
+        if (!$this->estPublicationExistante($donnees['titre'], $donnees['version'])) {
+            $requete = "INSERT INTO tblPublications( ";
+            $champs = '';
+            $valeurs = 'VALUES(';
+            foreach ($donnees as $key => $value) {
+                $champs.= $key . ',';
+                $valeurs .= ':'.$key . ',';
+            }
+            $champs.='dateSoumission)';
+            $valeurs .= 'CURRENT_TIMESTAMP)';
+            $requete .= $champs . $valeurs . " ;";
+            $stmt = $this->connexion->prepare($requete);
+            foreach ($donnees as $key => $value) {
+                $stmt->bindValue(':' . $key, $value);
+            }
+            $stmt->execute();
+//
+//            $stmt = $this->connexion->prepare(
+//                    "SELECT IDpublication FROM tblPublications "
+//                    . "WHERE titre = ?"
+//                    . "AND version = ?;"
+//            );
+//            $stmt->bindParam(1, $donnees['titre'], PDO::PARAM_STR);
+//            $stmt->bindParam(2, $donnees['version']);
+//            $stmt->execute();
+        }
+    }
+
     public function editerPublication($IDPublication, $donnees) {
         $requete = "UPDATE tblPublications SET ";
         foreach ($donnees as $key => $value) {
             $requete .= $key . " = :" . $key . ",";
         }
         $requete .= " dateSoumission = CURRENT_TIMESTAMP WHERE IDpublication = :IDpublicationCourante ;";
-        //echo $requete;
+
         $stmt = $this->connexion->prepare($requete);
 
 
@@ -113,7 +143,7 @@ class TblPublications {
                     ORDER BY " . $champ
         );
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $stmt->fetch();
     }
 
     /**
@@ -149,7 +179,7 @@ class TblPublications {
         }
 
         $rqt = substr($rqt, 0, strlen($rqt) - 5);
-        //echo $rqt;
+
         $stmt = $this->connexion->prepare($rqt);
         $stmt->execute();
         $publications = $stmt->fetchAll();
@@ -159,55 +189,74 @@ class TblPublications {
         return $publications;
     }
 
-    private function verifierAuteur($auteur) {
-        $trouve = 0;
+    private function estPublicationExistante($titre, $version) {
+        $trouve = FALSE;
         $stmt = $this->connexion->prepare(
-                "SELECT IDauteur FROM tblPublications "
-                . "WHERE nomAuteur = :nomAuteur"
-                . "AND prenomAuteur = :prenomAuteur;"
+                "SELECT * FROM tblPublications "
+                . "WHERE titre = ?"
+                . "AND version = ?;"
         );
-        $identiteAuteur = explode(" ", $auteur);
-        $nomAuteur = $auteur[0];
-        $prenomAuteur = $auteur[1];
-        $stmt->bindParam(':nomAuteur', $nomAuteur);
-        $stmt->bindParam(':prenomAuteur', $nomAuteur);
-        $trouve = $stmt->execute(); 
+        $stmt->bindParam(1, $titre, PDO::PARAM_STR);
+        $stmt->bindParam(2, $version);
+        $stmt->execute();
+        if (!empty($stmt->fetchAll())) {
+            $trouve = TRUE;
+        }
+        echo $trouve;
         return $trouve;
+    }
+
+    private function verifierAuteur($nomAuteur, $prenomAuteur) {
+        $stmt = $this->connexion->prepare(
+                "SELECT IDauteur FROM tblAuteurs "
+                . "WHERE nomAuteur = ?"
+                . "AND prenomAuteur = ?;"
+        );
+        $stmt->bindParam(1, $nomAuteur, PDO::PARAM_STR);
+        $stmt->bindParam(2, $prenomAuteur, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 
     private function ajouterAuteur($auteur) {
         $identiteAuteur = explode(" ", $auteur);
-        $nomAuteur = $auteur[0];
-        $prenomAuteur = $auteur[1];
+        $nomAuteur = $identiteAuteur [0];
+        $prenomAuteur = $identiteAuteur [1];
+        //on ne l'ajoute que s'il n'existe pas
+        $trouve = $this->verifierAuteur($nomAuteur, $prenomAuteur);
+        if (empty($trouve)) {
+            $stmt = $this->connexion->prepare(
+                    "INSERT INTO tblAuteurs(nomAuteur, prenomAuteur) VALUES (:nomAuteur, :prenomAuteur);"
+            );
+            $stmt->bindParam(':nomAuteur', $nomAuteur);
+            $stmt->bindParam(':prenomAuteur', $prenomAuteur);
+            $stmt->execute();
+        }
         $stmt = $this->connexion->prepare(
-                "INSERT INTO tblPublications(nomAuteur, prenomAuteur) VALUES (:nomAuteur, :prenomAuteur);"
+                "SELECT IDauteur FROM tblAuteurs WHERE nomAuteur=:nomAuteur AND prenomAuteur=:prenomAuteur;"
         );
         $stmt->bindParam(':nomAuteur', $nomAuteur);
-        $stmt->bindParam(':prenomAuteur', $nomAuteur);
+        $stmt->bindParam(':prenomAuteur', $prenomAuteur);
         $stmt->execute();
-        $stmt = $this->connexion->prepare(
-                "SELECT IDauteur WHERE nomAuteur=:nomAuteur and prenomAuteur=:prenomAuteur);"
-        );
-        $stmt->bindParam(':nomAuteur', $nomAuteur);
-        $stmt->bindParam(':prenomAuteur', $nomAuteur);
-        return $stmt->execute();
+        return $stmt->fetch();
     }
 
     private function lierPublicationAuteur($IDpublication, $IDauteur, $rang) {
         $stmt = $this->connexion->prepare(
                 "INSERT INTO tblAuteursPublications(IDpublication, IDauteur, rang) VALUES (:IDpublication, :IDauteur, :rang);"
         );
-        $stmt->bindParam(':IDpublication', $IDpublication);
-        $stmt->bindParam(':IDauteur', $IDauteur);
-        $stmt->bindParam(':rang', $rang);
+        $stmt->bindParam(':IDpublication', $IDpublication, PDO::PARAM_INT);
+        $stmt->bindParam(':IDauteur', $IDauteur, PDO::PARAM_INT);
+        $stmt->bindParam(':rang', $rang, PDO::PARAM_INT);
         $stmt->execute();
     }
 
     private function delierAuteurs($IDpublication) {
         $stmt = $this->connexion->prepare(
-                "DELETE FROM tblAuteursPublications WHERE IDpublication= :IDpublication);"
+                "DELETE FROM tblAuteursPublications WHERE IDpublication = :IDpublication;"
         );
         $stmt->bindParam(':IDpublication', $IDpublication);
+
         $stmt->execute();
     }
 
@@ -220,11 +269,10 @@ class TblPublications {
      */
     public function mettreAJourAuteurs($IDpublication, $listeAuteurs) {
         $this->delierAuteurs($IDpublication);
-        foreach ($listeAuteurs as $i => $auteur) {            
-            if ($this->verifierAuteur(trim($auteur))> 0) {
-                 $this->ajouterAuteur(trim($auteur));
-            }
-            $this->lierPublicationAuteur($IDpublication, $this->verifierAuteur(trim($auteur)), $i+1); ;
+        foreach ($listeAuteurs as $i => $auteur) {
+            $trouve = $this->ajouterAuteur(trim($auteur));
+            $this->lierPublicationAuteur($IDpublication, $trouve['IDauteur'], $i + 1);
+            ;
         }
     }
 

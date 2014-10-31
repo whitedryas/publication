@@ -1,7 +1,7 @@
 
 	<h3><?php echo $publication["titre"] ?></h3>
 	<span class="auteur">
-            <?php echo implode(',', $auteurs[0] ) ?>
+            <?php echo $auteurs; ?>
         </span>
     	<table class="pretty">
 		<thead>

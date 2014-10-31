@@ -74,9 +74,9 @@ class PublicationController {
         ));
     }
 
-    /********************************** */
+    /*     * ******************************* */
     /* ACTIONS SPECIFIQUES AU CHERCHEUR
-    /************************************ */
+      /************************************ */
 
     public function listerPourChercheur($idChercheur) {
         $publications = $this->modele
@@ -88,52 +88,82 @@ class PublicationController {
 
     public function editerUnePublication($idPublication) {
         $details = $this->detaillerUnePublication($idPublication);
-        $publication = $details['publication'];       
-        $auteurs = $details['auteurs'];        
-
+        $action = filter_input(INPUT_GET, 'action');
         $idConnecte = $_SESSION['utilisateur']->getIdUtilisateur();
 
         //on vérifie que le connecté est bien le soumissionnaire
-        if ($publication['soumisPar'] == $idConnecte) {           
-           
+        if ($details['publication']['soumisPar'] == $idConnecte) {
             if (isset($_POST['titre'])) {
-                /** recupération des donnees publication et auteurs" */
-                $donnees = array();
-                foreach ($_POST as $key => $value) {
-                    if ($key != 'auteurs' && $key != 'MAX_FILE_SIZE') {
-                        $donnees[$key] = filter_input(INPUT_POST, $key);
-                    }
-                }
-                //echo  $donnees['dateRedaction'];
-                $date = explode('/', $donnees['dateRedaction']);                
-                $date = new DateTime($date[2].'-'.$date[1].'-'.$date[0]);
-                $listeAuteurs= filter_input(INPUT_POST, 'auteurs');
-                $donnees['dateRedaction']= $date->format('Y-m-d');
-                $donnees['typeArticle'] = $this->typesArticle[$donnees['typeArticle']];
-                $donnees["urlDoc"] = UPLOAD . $idPublication . '-' . str_replace(' ', '_', $donnees["titre"]) . '_' . $donnees["version"];
-                $this->telechargerFichier('url', $donnees["urlDoc"]);
-                $this->modele->editerPublication($idPublication, $donnees);
-                $this->mettreAJourAuteurs($idPublication, $listeAuteurs);
-                $details = $this->detaillerUnePublication($idPublication);
-                $publication = $details['publication'];
-                $auteurs = $details['auteurs'];
-                
+                $details = $this->validerLeFormulaire($details, $action);
             }
-
-            /** TO DO MAJ auteurs* */
-            //$this->telechargerFichier($_FILES['url']['name'], UPLOAD . $_FILES['url']['temp_name']);
-//           $this->model->editerPublication($idPublication, $donnees);
             return render_template('chercheur', 'editer', array(
-                'publication' => $publication,
-                'auteurs' => $auteurs,
+                'publication' => $details['publication'],
+                'auteurs' => $details['auteurs'],
                 'options' => $this->typesArticle,
                 'langues' => $this->langues));
         }
     }
 
-    /* ********************** */
+    public function ajouterUnePublication() {
+        $details = array();
+        $action = filter_input(INPUT_GET, 'action');
+        if (isset($_POST['titre'])) {
+            return $this->validerLeFormulaire($details, $action);
+            
+        }
+        return render_template('chercheur', 'ajouter', array(
+            'options' => $this->typesArticle,
+            'langues' => $this->langues));
+    }
+
+    /*     * ******************** */
     /* ACTIONS COMMUNES
       /************************ */
+
+    private function validerLeFormulaire($details, $action) {
+        $idConnecte = $_SESSION['utilisateur']->getIdUtilisateur();
+        if(!empty($details)){
+            $idPublication = $details['publication']['IDpublication'];        
+        }
+        $donnees = array();
+        foreach ($_POST as $key => $value) {
+            if ($key != 'auteurs' && $key != 'MAX_FILE_SIZE') {
+                $donnees[$key] = filter_input(INPUT_POST, $key);
+            }
+        }
+
+        //retraitement de certaines données
+        if ($donnees['estPublique'] == 'on') {
+            $donnees['estPublique'] = 1;
+        } else {
+            $donnees['estPublique'] = 0;
+        }
+        $date = explode('/', $donnees['dateRedaction']);
+        $date = new DateTime($date[2] . '-' . $date[1] . '-' . $date[0]);
+        $listeAuteurs = filter_input(INPUT_POST, 'auteurs');
+        $donnees['dateRedaction'] = $date->format('Y-m-d');
+        
+        //die($donnees['dateRedaction']);
+        $donnees['typeArticle'] = $this->typesArticle[$donnees['typeArticle']];
+
+        /** téléchargement du fichier * */
+        $donnees["urlDoc"] = UPLOAD .  str_replace(' ', '_', $donnees["titre"]) . '_' . $donnees["version"];
+        $this->telechargerFichier('url', $donnees["urlDoc"]);
+        if($action == 'editer'){
+            $this->modele->editerPublication($idPublication, $donnees);
+        }elseif ($action == 'ajouter')  {
+            $donnees["soumisPar"] = $idConnecte;//            
+//            var_dump($donnees);
+//            die;
+            $this->modele->ajouterPublication($donnees);
+            //$idPublication = $publication['IDpublication'];
+        } 
+        /*         * mise à jour des auteurs * */
+        $this->mettreAJourAuteurs($idPublication, $listeAuteurs);
+        $details = $this->detaillerUnePublication($idPublication);
+        redirectionVersPage('chercheur', 'liste');
+        //return $details;
+    }
 
     private function detaillerUnePublication($idPublication) {
 
@@ -147,42 +177,44 @@ class PublicationController {
             return array('publication' => $publication, 'auteurs' => $this->listerLesAuteurs($auteurs));
         }
     }
-    
-    private function listerLesAuteurs($auteurs){
+
+    private function listerLesAuteurs($auteurs) {
         $liste = array();
-        foreach ($auteurs as $auteur) {      
-            array_push($liste, $auteur["auteur"]) ;
+        foreach ($auteurs as $auteur) {
+            array_push($liste, $auteur["auteur"]);
         }
-       
+
         return implode(',', $liste);
     }
-    
+
     /**
      * 
      * @param type $IDPublication
      * @param type $listeAuteurs: liste d'auteurs, chaine de caractère
      */
-    
-    private function mettreAJourAuteurs($IDPublication, $listeAuteurs){   
+    private function mettreAJourAuteurs($IDPublication, $listeAuteurs) {
         //comparer la liste avec les auteurs en base
         $detailsPub = $this->detaillerUnePublication($IDPublication);
-        $auteursEnBase= explode(',', $detailsPub['auteurs']);
+        $auteursEnBase = explode(',', $detailsPub['auteurs']);
         $listeAuteurs = explode(',', $listeAuteurs);
         $identique = true;
-        if(sizeof($auteursEnBase)!= sizeof($listeAuteurs)){ $identique=false;}
-        $i=0;
-        while($identique && $i< sizeof($auteursEnBase)){
-           if(trim($auteursEnBase[$i])!= trim($listeAuteurs[$i])){
+        if (sizeof($auteursEnBase) != sizeof($listeAuteurs)) {
+            $identique = false;
+        }
+        $i = 0;
+        while ($identique && $i < sizeof($auteursEnBase)) {
+            if (trim($auteursEnBase[$i]) != trim($listeAuteurs[$i])) {
                 $identique = false;
             }
             $i+=1;
         }
-        
-        echo $identique;
+
+        //print_r($listeAuteurs) ;
         // mettre à jour si la liste est différente
-//        if(!$identique){
-//            $this->modele->mettreAJourAuteurs($IDPublication, $listeAuteurs);
-//        }     
+        if (!$identique) {
+            //die('here');
+            $this->modele->mettreAJourAuteurs($IDPublication, $listeAuteurs);
+        }
     }
 
     private function trouverLesAuteursParListeDePublications($publications) {

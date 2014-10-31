@@ -36,6 +36,7 @@
             <?php endforeach; ?>
         </tbody>
     </table>
+    <a href="index.php?vue=chercheur&action=ajouter"><button type="button">Ajouter</button></a>
 </div>
 <?php include FOOTER; ?>
 
