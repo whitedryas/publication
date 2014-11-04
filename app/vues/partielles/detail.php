@@ -30,6 +30,8 @@
                                 ?></td>
                                 <td><?php if($publication["estPublique"]==1 || isIdentifie() ): ?>  
                                     <a href="<?php echo $publication["urlDoc"]; ?>">lien</a>
+                                    <?php else : ?>
+                                    non publique
                                     <?php endif; ?>
                                 </td>
 			</tr>

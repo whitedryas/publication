@@ -15,7 +15,7 @@
         <tbody>
             <?php foreach ($publications as $publication): ?>
                 <tr>
-                    <td><a href="#"><?php echo $publication['titre'] ?></a></td>
+                    <td><a href="index.php?vue=chercheur&action=detail&id=<?php echo $publication['IDpublication'] ?>"><?php echo $publication['titre'] ?></a></td>
                     <td><?php echo $publication['typeArticle'] ?></td>
                     <td><?php echo date('d/m/Y', strtotime($publication['dateSoumission'])); ?></td>
                     <td><?php
@@ -38,6 +38,3 @@
     </table>
     <a href="index.php?vue=chercheur&action=ajouter"><button type="button">Ajouter</button></a>
 </div>
-<?php include FOOTER; ?>
-
-

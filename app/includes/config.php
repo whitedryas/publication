@@ -1,14 +1,14 @@
 <?php
 include CONTROLEURS.'PublicationController.php';
 //die(CONTROLEURS);
-//$user ='severine';
-//$pass= 'S3v3rin3';
-//$database = 'D605';
+$user ='severine';
+$pass= 'S3v3rin3';
+$database = 'D605';
 
 
-$user ='appli';
-$pass= 'b6aU6Sfvx6caGSme';
-$database = 'appli';
+//$user ='appli';
+//$pass= 'b6aU6Sfvx6caGSme';
+//$database = 'appli';
 $host = 'localhost';
 $options = array(
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
@@ -47,8 +47,8 @@ function render_template($vue, $action, $variables){
  */
 function redirectionVersPage($vue, $action){
     //$serveur_dir = $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . '/';
-    $chemin=''; //local 
-//    $chemin='/MIAGE/Projet Studio/dev'; //prod
+//    $chemin=''; //local 
+    $chemin='/MIAGE/Projet Studio/dev'; //prod
     $serveur_dir = $_SERVER['HTTP_HOST'].$chemin.'/index.php';    
     $vue= 'vue='.$vue;
     $action= '&action='.$action;
