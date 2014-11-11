@@ -39,5 +39,16 @@
 	</table>
 	<h4>Résumé</h4>
 	<p class="justifie"><?php echo $publication["resume"] ?></p>
+        
+        <?php
+        if (filter_input(INPUT_GET, 'vue', FILTER_SANITIZE_STRIPPED)=="publique"){
+            echo "<a href='index.php?vue=publique&action=recherche'><input type=\"button\" value=\"Retour\"></a>";
+        }else{
+            echo "<input type=\"button\" value=\"Retour\" onclick=\"history.go(-1)\"/>";
+        }
+        if (isIdentifie() && $publication["statut"]!="Validé"){
+            echo "<a href='index.php?vue=chercheur&action=editer&id=" . $publication['IDpublication'] . "'><input type='button' name='modifier' value='Modifier' style=''></a>";
+        }
+        ?>
 
 

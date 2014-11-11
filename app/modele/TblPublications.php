@@ -108,7 +108,7 @@ class TblPublications {
         foreach ($donnees as $key => $value) {
             $requete .= $key . " = :" . $key . ",";
         }
-        $requete .= " dateSoumission = CURRENT_TIMESTAMP WHERE IDpublication = :IDpublicationCourante ;";
+        $requete .= " statut ='En attente' WHERE IDpublication = :IDpublicationCourante ;";
         $stmt = $this->connexion->prepare($requete);
         foreach ($donnees as $key => $value) {
             $stmt->bindValue(':' . $key, $value);

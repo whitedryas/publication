@@ -92,7 +92,9 @@ class PublicationController {
         $idConnecte = $_SESSION['utilisateur']->getIdUtilisateur();
 
         //on vérifie que le connecté est bien le soumissionnaire
-        if ($details['publication']['soumisPar'] == $idConnecte) {
+        //MAJ du 31/10/2014
+        //et que la publication n'a pas été validée
+        if ($details['publication']['soumisPar'] == $idConnecte && $details['publication']['statut']!="Validé") {
             if (isset($_POST['titre'])) {
                 $details = $this->validerLeFormulaire($details, $action);
             }
@@ -101,9 +103,12 @@ class PublicationController {
                 'auteurs' => $details['auteurs'],
                 'options' => $this->typesArticle,
                 'langues' => $this->langues));
+        }else{
+            return render_template('publique', 'dejaValidee', array());
         }
+        //FIN MAJ du 31/10/2014
     }
-
+    
     /*     * ******************** */
     /* ACTIONS COMMUNES
       /************************ */
